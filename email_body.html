@@ -1,22 +1,10 @@
-from pathlib import Path
-import os
-
-from dotenv import load_dotenv
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-
-load_dotenv()
-
-base_dir = Path(__file__).resolve().parent
-html_path = base_dir / "email_body.html"
-html_content = """
 <!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Bienvenido (plain_text_content)</title>
+    <title>Bienvenido (html_content)</title>
     <!--[if mso]>
       <noscript>
         <xml>
@@ -46,7 +34,7 @@ html_content = """
   <body style="background:#f4f6f8; margin:0; padding:0;">
     <!-- Preheader (hidden) -->
     <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
-      ¡Bienvenido_html_content! Tu cuenta ya está lista. Revisa los próximos pasos para comenzar.
+      ¡Bienvenido! Tu cuenta ya está lista. Revisa los próximos pasos para comenzar.
     </div>
 
     <table role="presentation" width="100%" style="background:#f4f6f8;">
@@ -70,7 +58,7 @@ html_content = """
                   <tr>
                     <td class="px" style="padding: 28px 24px 10px 24px;">
                       <div style="font-family: Arial, Helvetica, sans-serif; font-size: 22px; line-height: 30px; color:#111827; font-weight:700;">
-                        ¡Bienvenido_html_content, {{first_name}}!
+                        ¡Bienvenido, {{first_name}}!
                       </div>
                       <div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 22px; color:#374151; padding-top:10px;">
                         Tu cuenta ya está activa. Este correo es una prueba de envío con SendGrid y además te deja los próximos pasos para comenzar.
@@ -147,26 +135,3 @@ html_content = """
     </table>
   </body>
 </html>
-"""
-plain_text_content = """
-¡Bienvenido_plain_text_content! Tu cuenta ya está lista. Revisa los próximos pasos para comenzar.
-"""
-
-message = Mail(
-    from_email=("antonio.vitalic@conergie.cl", "Conergie"),
-    to_emails=("antoninte99@gmail.com", "Antonio"),
-    subject="Bienvenido (test)",
-    plain_text_content=plain_text_content,
-    html_content=html_content,
-)
-payload = message.get()
-print(payload["content"])  # debe traer text/plain y text/html
-
-api_key = os.environ.get("SENDGRID_API_KEY")
-if not api_key:
-    raise RuntimeError("Falta SENDGRID_API_KEY en el entorno")
-
-sg = SendGridAPIClient(api_key)
-response = sg.send(message)
-print(response.status_code)
-print(response.headers)
